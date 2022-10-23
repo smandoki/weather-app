@@ -1,14 +1,33 @@
 const searchForm = document.getElementById('search-form');
+const loader = document.querySelector('.loader');
+const humidity = document.getElementById('humidity');
+const temperature = document.getElementById('temperature');
+const min = document.getElementById('min');
+const max = document.getElementById('max');
+const table = document.querySelector('table');
+const caption = document.querySelector('caption');
 
 searchForm.onsubmit = async (e) => {
     e.preventDefault();
-
+    loader.classList.remove('hidden');
+    
     const city = searchForm.city.value;
+    searchForm.reset();
 
     const data = await getWeatherByCity(city);
-    console.log(data);
+    
+    loader.classList.add('hidden');
 
-    searchForm.reset();
+    if (data) {
+        humidity.innerText = data.humidity;
+        temperature.innerText = data.temp;
+        min.innerText = data.temp_min;
+        max.innerText = data.temp_max;
+        table.classList.remove('hidden');
+        caption.innerText = city;
+    } else {
+        alert('city not found');
+    }
 }
 
 async function getWeatherByCity(city) {
@@ -16,10 +35,6 @@ async function getWeatherByCity(city) {
 
     const response = await fetch(endpoint, {mode: "cors"});
     
-    if (!response.ok) {
-        throw new Error(response.statusText);
-    }
-
     const data = await response.json();
     return data.main;
 }
